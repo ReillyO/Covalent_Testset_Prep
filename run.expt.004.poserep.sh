@@ -120,7 +120,8 @@ EOF
  
 ${dockdir}/dock6 -V -i cov.in -o cov.out &
 EOF
-
+  
+  chmod +x submit.sh
   srun --mem-per-cpu=5000 --exclusive --ntasks-per-core=1 -N1 -n1 -W 0 submit.sh &
   
 done
