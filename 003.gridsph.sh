@@ -9,7 +9,7 @@
 dockdir=${DOCKHOME}
 amberbin=${AMBERBIN}
 rootdir=${ROOTDIR}
-chimeradir=${CHIMERAHOME}
+chimerabin=${CHIMERABIN}
 dmsdir=${DMSHOME}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
@@ -166,7 +166,7 @@ bump_overlap                              0.75
 receptor_file                             00.${system}.rec.clean.mol2
 box_file                                  ${system}.box.pdb
 vdw_definition_file                       ${dockdir}/parameters/vdw_AMBER_parm99.defn
-chemical_definition_file                  ${dockdir}/dock6.9_mpiv2018.0.3/parameters/chem.defn
+chemical_definition_file                  ${dockdir}/parameters/chem.defn
 score_grid_prefix                         ${system}.rec
 EOF
 ##########################################

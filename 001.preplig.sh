@@ -4,7 +4,7 @@
 
 dockdir=${DOCKHOME}
 amberbin=${AMBERBIN}
-chimeradir=${CHIMERAHOME}
+chimerabin=${CHIMERABIN}
 rootdir=${ROOTDIR}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
@@ -140,7 +140,7 @@ fi
 
 
 # also create a PDB file of the ligand for sphere generation
-${chimeradir}/chimera --nogui --script "${scriptdir}/removehs.chim.py 03.${system}.lig.am1bcc.mol2 temp1.pdb" > 03.chim2.lig.v.out
+${chimerabin}/chimera --nogui --script "${scriptdir}/removehs.chim.py 03.${system}.lig.am1bcc.mol2 temp1.pdb" > 03.chim2.lig.v.out
 grep '^ATOM  \|^TER  \|^END  \|^HETATM' temp1.pdb > 03.${system}.lig.noch.pdb 
 
 if grep -qi error 03.chim2.lig.v.out; then echo "Error in Chimera step 2! Exiting..."; exit 1; fi

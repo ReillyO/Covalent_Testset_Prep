@@ -9,11 +9,12 @@ module load chimera
 # not to bin
 export DOCKHOME="/path/to/dock/installation/"
 
-export DMSHOME="/path/to/dms/executable/dms"
+# bin
+export DMSHOME="/path/to/dms/installation"
 
 export AMBERBIN="/path/to/amber/bin"
 
-export CHIMERAHOME="/path/to/chimera/bin"
+export CHIMERABIN="/path/to/chimera/bin"
 
 export ROOTDIR=`pwd`
 

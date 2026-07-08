@@ -16,7 +16,7 @@
 dockdir=${DOCKHOME}
 amberbin=${AMBERBIN}
 rootdir=${ROOTDIR}
-chimeradir=${CHIMERAHOME}
+chimerabin=${CHIMERABIN}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
 scriptdir=${rootdir}/zzz.scripts/
@@ -112,7 +112,7 @@ if grep FATAL 01.rec.tleap.v.out; then echo "Tleap had some errors in ${system},
 
 # strip Hs off of the receptor now that it has been renumbered/processed
 ${amberbin}/ambpdb -p ${system}.rec.preproc.parm7 -c 01.${system}.rec.ori.crd > temp1.pdb
-${chimeradir}/chimera --nogui --script "${scriptdir}/removehs.chim.py \
+${chimerabin}/chimera --nogui --script "${scriptdir}/removehs.chim.py \
                                         temp1.pdb \
                                         02.${system}.rec.noch.pdb" >& 02.chim2.v.out
 
