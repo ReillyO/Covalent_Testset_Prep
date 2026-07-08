@@ -48,7 +48,7 @@ if [ -e ${testsetdir}/${system} ]; then
 	if [ ${overwrite} = true ]; then 
 		rm -r ${testsetdir}/${system}; 
 	else
-		echo "System data already exists! Specify -o to overwrite and try again."
+		echo "System data already exists! Specify -O to overwrite and try again."
 		exit 1
 	fi
 fi
