@@ -66,6 +66,12 @@ Users can also use the `run.prep.allsteps.sh` script to prepare the ligand, comp
 
 ```bash run.prep.allsteps.sh 1ABC```
 
+### Re-Running Incomplete Preparation
+
+The `run.prep.incomplete.sh` script performs the same actions as the `run.prep.allsteps.sh` script, for all systems which are not identified as complete (having a receptor file in zzz.master but no .bmp grid file in the system prep directory). 
+
+Incomplete systems can be identified explicitly by the `checkincomplete.sh` script in the zzz.scripts directory. 
+
 ## 2: Benchmarking
 
 After systems have been prepared, they can be used to benchmark the current DOCK6 implementation. 
