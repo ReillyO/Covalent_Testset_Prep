@@ -7,9 +7,10 @@
 # files for the system provided
 
 dockdir=${DOCKHOME}
-amberdir=${AMBERHOME}
+amberbin=${AMBERBIN}
 rootdir=${ROOTDIR}
 chimeradir=${CHIMERAHOME}
+dmsdir=${DMSHOME}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
 scriptdir=${rootdir}/zzz.scripts/
@@ -68,7 +69,7 @@ ${scriptdir}/keep_close_atoms.pl 00.${system}.lig.clean.mol2 00.${system}.rec.cl
 
 # create receptor surface with no Hs using DMS
 echo "Creating surface using DMS..."
-/gpfs/projects/rizzo/zzz.programs/dms/bin/dms rec_for_dms.pdb -a -g ${system}.rec.dms.log -n -o ${system}.rec.dms.out > dms.v.out
+${dmsdir}/bin/dms rec_for_dms.pdb -a -g ${system}.rec.dms.log -n -o ${system}.rec.dms.out > dms.v.out
 
 if grep -iq error dms.v.out; then echo "DMS had some errors, exiting..."; exit 1; fi
 
@@ -92,7 +93,7 @@ if [ -e temp* ]; then rm temp*; fi
 if [ -e ${system}.rec.sph ]; then rm ${system}.rec.sph; fi
 if [ -e OUTSPH ]; then rm OUTSPH; fi
 
-sphgen -i INSPH -o OUTSPH > sphgen.v.out
+${dockdir}/bin/sphgen -i INSPH -o OUTSPH > sphgen.v.out
 
 if grep -iq error sphgen.v.out; then echo "sphgen had some errors, exiting..."; exit 1; fi
 
@@ -139,7 +140,7 @@ ligand_spheres_for_grid.sph
 ${system}.box.pdb
 EOF
 ###########################################
-showbox < showbox.in > showbox.v.out
+${dockdir}/bin/showbox < showbox.in > showbox.v.out
 
 if grep -iq error showbox.v.out; then echo "showbox had some errors, exiting..."; exit 1; fi
 
@@ -164,13 +165,13 @@ bump_filter                               yes
 bump_overlap                              0.75
 receptor_file                             00.${system}.rec.clean.mol2
 box_file                                  ${system}.box.pdb
-vdw_definition_file                       /gpfs/projects/rizzo/zzz.programs/dock6.9_mpiv2018.0.3/parameters/vdw_AMBER_parm99.defn
-chemical_definition_file                  /gpfs/projects/rizzo/zzz.programs/dock6.9_mpiv2018.0.3/parameters/chem.defn
+vdw_definition_file                       ${dockdir}/parameters/vdw_AMBER_parm99.defn
+chemical_definition_file                  ${dockdir}/dock6.9_mpiv2018.0.3/parameters/chem.defn
 score_grid_prefix                         ${system}.rec
 EOF
 ##########################################
 
-grid -i grid.in -o grid.out > grid.v.out
+${dockdir}/bin/grid -i grid.in -o grid.out > grid.v.out
 
 if grep -iq error grid.out; then echo "Grid had some errors, exiting..."; exit 1; fi
 if grep -iq error grid.v.out; then echo "Grid had some errors, exiting..."; exit 1; fi

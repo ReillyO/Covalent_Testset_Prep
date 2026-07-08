@@ -3,7 +3,7 @@
 # Currently accepts a Mol2 file of the ligand (including attached CYS residue) with hydrogens and Gasteiger charge
 
 dockdir=${DOCKHOME}
-amberdir=${AMBERHOME}
+amberbin=${AMBERBIN}
 chimeradir=${CHIMERAHOME}
 rootdir=${ROOTDIR}
 testsetdir=${rootdir}/zzz.testset_files/
@@ -75,7 +75,7 @@ EOF
 ##################################################
 
 # reformat ligand Mol2 in DOCK-friendly format
-dock6 -i 01.dock.lig.in -o 01.dock.lig.out
+${dockdir}/bin/dock6 -i 01.dock.lig.in -o 01.dock.lig.out
 
 # do the same for the cofactor file if exists 
 if [ $has_cofactor = true ]; then
@@ -101,7 +101,7 @@ rank_ligands                                                 no
 EOF
 ##################################################
 
-  dock6 -i 01.dock.cof.in -o 01.dock.cof.out
+  ${dockdir}/bin/dock6 -i 01.dock.cof.in -o 01.dock.cof.out
 
 fi
 
@@ -113,14 +113,14 @@ fi
 
 echo "Assigning AM1BCC charges to ligand with Antechamber..."
 # charge the DOCK output molecule with AM1BCC empirical charges via Antechamber
-${amberdir}/antechamber -fi mol2 -fo mol2 -c bcc -at sybyl -s 2 -pf y -i 02.${system}.lig_scored.mol2 -o 03.${system}.lig.am1bcc.mol2 -dr no > 02.lig.ante1.out
+${amberbin}/antechamber -fi mol2 -fo mol2 -c bcc -at sybyl -s 2 -pf y -i 02.${system}.lig_scored.mol2 -o 03.${system}.lig.am1bcc.mol2 -dr no > 02.lig.ante1.out
 
 if grep -qi error 02.lig.ante1.out; then echo "Error in ligand Antechamber step 1! Exiting..."; exit 1; fi
 
 # if initial SQM run doesn't converge, we run a looser parameter sim
 if [ `grep "No convergence in SCF" sqm.out | wc -l` ]; then
         echo "Running second round of Antechamber due to no convergence..."
-	${amberdir}/antechamber -fi mol2 -fo mol2 -c bcc -j 5 -at sybyl -s 2 -pf y -ek "itrmax=1000, qm_theory='AM1', grms_tol=0.01, tight_p_conv=0, scfconv=1.d-8" -i 02.${system}.lig_scored.mol2 -o 03.${system}.lig.am1bcc.mol2 -dr no > 02.lig.ante2.out
+	${amberbin}/antechamber -fi mol2 -fo mol2 -c bcc -j 5 -at sybyl -s 2 -pf y -ek "itrmax=1000, qm_theory='AM1', grms_tol=0.01, tight_p_conv=0, scfconv=1.d-8" -i 02.${system}.lig_scored.mol2 -o 03.${system}.lig.am1bcc.mol2 -dr no > 02.lig.ante2.out
 	if grep -qi error 02.lig.ante2.out; then echo "Error in ligand Antechamber step 2! Exiting..."; exit 1; fi
 fi
 
@@ -128,12 +128,12 @@ fi
 # repeat the whole antechamber charging process for the cofactor if needed
 if [ $has_cofactor = true ]; then
   echo "Assigning AM1BCC charges to cofactor with Antechamber..."
-  ${amberdir}/antechamber -fi mol2 -fo mol2 -c bcc -at sybyl -s 2 -pf y -i 02.${system}.cof_scored.mol2 -o 03.${system}.cof.am1bcc.mol2 -dr no > 02.cof.ante1.out
+  ${amberbin}/antechamber -fi mol2 -fo mol2 -c bcc -at sybyl -s 2 -pf y -i 02.${system}.cof_scored.mol2 -o 03.${system}.cof.am1bcc.mol2 -dr no > 02.cof.ante1.out
   if grep -qi error 02.cof.ante1.out; then echo "Error in cofactor Antechamber step 1! Exiting..."; exit 1; fi
 
   if [ `grep "No convergence in SCF" sqm.out | wc -l` ]; then
     echo "Running second round of Antechamber due to no convergence..."
-    ${amberdir}/antechamber -fi mol2 -fo mol2 -c bcc -j 5 -at sybyl -s 2 -pf y -ek "itrmax=1000, qm_theory='AM1', grms_tol=0.01, tight_p_conv=0, scfconv=1.d-8" -i 02.${system}.cof_scored.mol2 -o 03.${system}.cof.am1bcc.mol2 -dr no > 02.cof.ante2.out
+    ${amberbin}/antechamber -fi mol2 -fo mol2 -c bcc -j 5 -at sybyl -s 2 -pf y -ek "itrmax=1000, qm_theory='AM1', grms_tol=0.01, tight_p_conv=0, scfconv=1.d-8" -i 02.${system}.cof_scored.mol2 -o 03.${system}.cof.am1bcc.mol2 -dr no > 02.cof.ante2.out
   fi
   if grep -qi error 02.cof.ante2.out; then echo "Error in cofactor Antechamber step 2! Exiting..."; exit 1; fi
 fi

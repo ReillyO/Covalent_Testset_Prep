@@ -11,7 +11,7 @@ export DOCKHOME="/path/to/dock/installation/"
 
 export DMSHOME="/path/to/dms/executable/dms"
 
-export AMBERHOME="/path/to/amber/bin"
+export AMBERBIN="/path/to/amber/bin"
 
 export CHIMERAHOME="/path/to/chimera/bin"
 

@@ -14,7 +14,7 @@
 # Assumes the ligand file is in zzz.master/ 
 
 dockdir=${DOCKHOME}
-amberdir=${AMBERHOME}
+amberbin=${AMBERBIN}
 rootdir=${ROOTDIR}
 chimeradir=${CHIMERAHOME}
 testsetdir=${rootdir}/zzz.testset_files/
@@ -106,12 +106,12 @@ quit
 EOF
 ##################################################
 
-${amberdir}/tleap -s -f 01.rec.leap.in >& 01.rec.tleap.v.out
+${amberbin}/tleap -s -f 01.rec.leap.in >& 01.rec.tleap.v.out
 
 if grep FATAL 01.rec.tleap.v.out; then echo "Tleap had some errors in ${system}, exiting..."; exit 1; fi
 
 # strip Hs off of the receptor now that it has been renumbered/processed
-${amberdir}/ambpdb -p ${system}.rec.preproc.parm7 -c 01.${system}.rec.ori.crd > temp1.pdb
+${amberbin}/ambpdb -p ${system}.rec.preproc.parm7 -c 01.${system}.rec.ori.crd > temp1.pdb
 ${chimeradir}/chimera --nogui --script "${scriptdir}/removehs.chim.py \
                                         temp1.pdb \
                                         02.${system}.rec.noch.pdb" >& 02.chim2.v.out
@@ -123,19 +123,19 @@ rm temp1.pdb
 
 ### Prepare the ligand file with antechamber / CPC Specify gaff2 at as junmei suggested for COF
 echo "Creating ligand prep file with antechamber"
-${amberdir}/antechamber -i 00.${system}.lig.am1bcc.mol2 -fi mol2  -o 01.${system}.lig.ante.mol2 -fo mol2 -at gaff2 -j 5 -rn LIG -dr n > 00.${system}.lig.ante.out
+${amberbin}/antechamber -i 00.${system}.lig.am1bcc.mol2 -fi mol2  -o 01.${system}.lig.ante.mol2 -fo mol2 -at gaff2 -j 5 -rn LIG -dr n > 00.${system}.lig.ante.out
 echo "Creating ligand prep file with parmchk2"
-${amberdir}/parmchk2 -i 01.${system}.lig.ante.mol2 -f mol2 -o ${system}.lig.ante.frcmod
+${amberbin}/parmchk2 -i 01.${system}.lig.ante.mol2 -f mol2 -o ${system}.lig.ante.frcmod
 
 ### Prepare the cofactor file with antechamber, if it exists 
 if [ $has_cofactor = true ]; then
   echo "Creating cofactor prep file with antechamber" 
-  ${amberdir}/antechamber -fi mol2 -fo prepi -i 00.${system}.cof.am1bcc.mol2 -o $system.cof.ante.prep -at gaff2 -j 5 -rn COF -dr no > 01.${system}.cof.ante.out
+  ${amberbin}/antechamber -fi mol2 -fo prepi -i 00.${system}.cof.am1bcc.mol2 -o $system.cof.ante.prep -at gaff2 -j 5 -rn COF -dr no > 01.${system}.cof.ante.out
   echo "Creating cofactor pdb file with antechamber" 
-  ${amberdir}/antechamber -fi mol2 -fo pdb -i 00.${system}.cof.am1bcc.mol2 -o 01.${system}.cof.ante.pdb -j 5 -rn COF -dr no > 01.${system}.cof.ante2.out
+  ${amberbin}/antechamber -fi mol2 -fo pdb -i 00.${system}.cof.am1bcc.mol2 -o 01.${system}.cof.ante.pdb -j 5 -rn COF -dr no > 01.${system}.cof.ante2.out
 
   echo "Creating cofactor frcmod file with parmchk2" 
-  ${amberdir}/parmchk2 -i ${system}.cof.ante.prep -f prepi -o ${system}.cof.ante.frcmod
+  ${amberbin}/parmchk2 -i ${system}.cof.ante.prep -f prepi -o ${system}.cof.ante.frcmod
 fi
 
 # use TLeap to prepare complex using receptor, ligand, cofactor
@@ -182,11 +182,11 @@ echo "quit" >> 02.com.leap.in
 ### Use leap to generate complex
 echo "------------ LEAP RUN_002 SUMMARY -------------"
 echo "Purpose: Generate complex with ssbonds"
-${amberdir}/tleap -s -f 02.com.leap.in >& 03.${system}.com.leap.log
-${amberdir}/ambpdb -p ${system}.lig.parm -tit "lig" -c 03.${system}.lig.ori.crd > 03.${system}.lig.ori.pdb
-${amberdir}/ambpdb -p ${system}.pro.parm -tit "pro" -c 03.${system}.pro.ori.crd > 03.${system}.pro.ori.pdb
-${amberdir}/ambpdb -p ${system}.rec.parm -tit "rec" -c 03.${system}.rec.ori.crd > 03.${system}.rec.ori.pdb
-${amberdir}/ambpdb -p ${system}.com.parm -tit "com" -c 03.${system}.com.ori.crd > 03.${system}.com.ori.pdb
+${amberbin}/tleap -s -f 02.com.leap.in >& 03.${system}.com.leap.log
+${amberbin}/ambpdb -p ${system}.lig.parm -tit "lig" -c 03.${system}.lig.ori.crd > 03.${system}.lig.ori.pdb
+${amberbin}/ambpdb -p ${system}.pro.parm -tit "pro" -c 03.${system}.pro.ori.crd > 03.${system}.pro.ori.pdb
+${amberbin}/ambpdb -p ${system}.rec.parm -tit "rec" -c 03.${system}.rec.ori.crd > 03.${system}.rec.ori.pdb
+${amberbin}/ambpdb -p ${system}.com.parm -tit "com" -c 03.${system}.com.ori.crd > 03.${system}.com.ori.pdb
 echo -n "atoms in 03.${system}.lig.ori.pdb = "
 grep -c ATOM 03.${system}.lig.ori.pdb
 echo -n "atoms in 03.${system}.pro.ori.pdb = "
@@ -200,20 +200,20 @@ grep -c ATOM 03.${system}.com.ori.pdb
 echo "Creating ori.mol2 files before minimization"
 
 echo "lig"
-${amberdir}/ambpdb -p ${system}.lig.parm -c 03.${system}.lig.ori.crd -mol2 > ${system}.lig.ori.0.mol2
-${amberdir}/antechamber -s 2 -i ${system}.lig.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.lig.ori.mol2 -fo mol2 -dr n > 03.lig.ori.ante.out
+${amberbin}/ambpdb -p ${system}.lig.parm -c 03.${system}.lig.ori.crd -mol2 > ${system}.lig.ori.0.mol2
+${amberbin}/antechamber -s 2 -i ${system}.lig.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.lig.ori.mol2 -fo mol2 -dr n > 03.lig.ori.ante.out
 echo "pro"
-${amberdir}/ambpdb -p ${system}.pro.parm -c 03.${system}.pro.ori.crd -mol2 > ${system}.pro.ori.0.mol2
-${amberdir}/antechamber -s 2 -i ${system}.pro.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.pro.ori.mol2 -fo mol2 -dr n > 03.pro.ori.ante.out
+${amberbin}/ambpdb -p ${system}.pro.parm -c 03.${system}.pro.ori.crd -mol2 > ${system}.pro.ori.0.mol2
+${amberbin}/antechamber -s 2 -i ${system}.pro.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.pro.ori.mol2 -fo mol2 -dr n > 03.pro.ori.ante.out
 echo "rec"
-${amberdir}/ambpdb -p ${system}.rec.parm -c 03.${system}.rec.ori.crd -mol2 > ${system}.rec.ori.0.mol2
-${amberdir}/antechamber -s 2 -i ${system}.rec.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.rec.ori.mol2 -fo mol2 -dr n > 03.rec.ori.ante.out
+${amberbin}/ambpdb -p ${system}.rec.parm -c 03.${system}.rec.ori.crd -mol2 > ${system}.rec.ori.0.mol2
+${amberbin}/antechamber -s 2 -i ${system}.rec.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.rec.ori.mol2 -fo mol2 -dr n > 03.rec.ori.ante.out
 echo "com"
-${amberdir}/ambpdb -p ${system}.com.parm -c 03.${system}.com.ori.crd -mol2 > ${system}.com.ori.0.mol2
-${amberdir}/antechamber -s 2 -i ${system}.com.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.com.ori.mol2 -fo mol2 -dr n > 03.com.ori.ante.out
+${amberbin}/ambpdb -p ${system}.com.parm -c 03.${system}.com.ori.crd -mol2 > ${system}.com.ori.0.mol2
+${amberbin}/antechamber -s 2 -i ${system}.com.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.com.ori.mol2 -fo mol2 -dr n > 03.com.ori.ante.out
 if [ $has_cofactor = true ]; then 
-  ${amberdir}/ambpdb -p ${system}.cof.parm -c 03.${system}.cof.ori.crd -mol2 > ${system}.cof.ori.0.mol2
-  ${amberdir}/antechamber -s 2 -i ${system}.cof.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.cof.ori.mol2 -fo mol2 -dr n > 03.cof.ori.ante.out
+  ${amberbin}/ambpdb -p ${system}.cof.parm -c 03.${system}.cof.ori.crd -mol2 > ${system}.cof.ori.0.mol2
+  ${amberbin}/antechamber -s 2 -i ${system}.cof.ori.0.mol2 -fi mol2 -at sybyl -j 5 -o 03.${system}.cof.ori.mol2 -fo mol2 -dr n > 03.cof.ori.ante.out
   rm ${system}.cof.ori.0.mol2
 fi
 
@@ -243,8 +243,8 @@ EOF
 
 echo "---------------------------------------------------------"
 echo "Minimizing complex with sander"
-${amberdir}/sander -O -i 03.sander.in -o 03.sander.out -p ${system}.com.parm -c 03.${system}.com.ori.crd -ref 03.${system}.com.ori.crd -r 04.${system}.com.min.rst
-${amberdir}/ambpdb -p ${system}.com.parm -tit "04.${system}.com.min" -c 04.${system}.com.min.rst > 04.${system}.com.min.pdb
+${amberbin}/sander -O -i 03.sander.in -o 03.sander.out -p ${system}.com.parm -c 03.${system}.com.ori.crd -ref 03.${system}.com.ori.crd -r 04.${system}.com.min.rst
+${amberbin}/ambpdb -p ${system}.com.parm -tit "04.${system}.com.min" -c 04.${system}.com.min.rst > 04.${system}.com.min.pdb
 
 # sanity check for failure
 if [ ! -e 04.${system}.com.min.rst ]; then echo "Complex minimizaton failed! Terminating."; exit; fi
@@ -266,9 +266,9 @@ EOF
 ##################################################
 
 echo "Minimizing unrestrained gas-phase ligand alone with sander"
-${amberdir}/sander -O -i 03.sander.lig.in -o 03.sander.lig.out -p ${system}.lig.parm -c 03.${system}.lig.ori.crd -r 04.${system}.lig.only.min.rst
-${amberdir}/ambpdb -p ${system}.lig.parm -c 04.${system}.lig.only.min.rst -mol2 > ${system}.lig.only.min.0.mol2
-${amberdir}/antechamber -s 2 -i ${system}.lig.only.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.lig.only.min.mol2 -fo mol2 -dr n > 04.lig.only.ante.out
+${amberbin}/sander -O -i 03.sander.lig.in -o 03.sander.lig.out -p ${system}.lig.parm -c 03.${system}.lig.ori.crd -r 04.${system}.lig.only.min.rst
+${amberbin}/ambpdb -p ${system}.lig.parm -c 04.${system}.lig.only.min.rst -mol2 > ${system}.lig.only.min.0.mol2
+${amberbin}/antechamber -s 2 -i ${system}.lig.only.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.lig.only.min.mol2 -fo mol2 -dr n > 04.lig.only.ante.out
 
 rm ${system}.lig.only.min.0.mol2
 
@@ -283,9 +283,9 @@ if [ $has_cofactor = true ];then
         echo "---------------------------------------------------------"
         echo "Minimizing unrestrained gas-phase cofactor alone with sander"
         cp 03.sander.lig.in 03.sander.cof.in
-        ${amberdir}/sander -O -i 03.sander.cof.in -o 03.sander.cof.out -p ${system}.cof.parm -c 03.${system}.cof.ori.crd -r 04.${system}.cof.only.min.rst
-        ${amberdir}/ambpdb -p ${system}.cof.parm -c 04.${system}.cof.only.min.rst -mol2 > ${system}.cof.only.min.0.mol2
-	${amberdir}/antechamber -s 2 -i ${system}.cof.only.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.cof.only.min.mol2 -fo mol2 -dr n > 04.cof.only.ante.out
+        ${amberbin}/sander -O -i 03.sander.cof.in -o 03.sander.cof.out -p ${system}.cof.parm -c 03.${system}.cof.ori.crd -r 04.${system}.cof.only.min.rst
+        ${amberbin}/ambpdb -p ${system}.cof.parm -c 04.${system}.cof.only.min.rst -mol2 > ${system}.cof.only.min.0.mol2
+	${amberbin}/antechamber -s 2 -i ${system}.cof.only.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.cof.only.min.mol2 -fo mol2 -dr n > 04.cof.only.ante.out
 
         grep "SANDER BOMB" 03.sander.cof.out
         grep -A1 NSTEP 03.sander.cof.out | tail -2
@@ -303,13 +303,13 @@ echo "Extracting receptor with cpptraj"
 echo "trajin 04.${system}.com.min.rst" > 04.rec.ptraj.in
 echo "strip :LIG" >> 04.rec.ptraj.in
 echo "trajout 04.${system}.rec.min.rst restart"  >> 04.rec.ptraj.in
-${amberdir}/cpptraj ${system}.com.parm 04.rec.ptraj.in >& 04.rec.ptraj.out
+${amberbin}/cpptraj ${system}.com.parm 04.rec.ptraj.in >& 04.rec.ptraj.out
 grep STRIP 04.rec.ptraj.out
 echo "Writing receptor mol2"
 
 #Yuzhang modification made for multiple ligands aka waters etc.
-${amberdir}/ambpdb -p ${system}.rec.parm -c 04.${system}.rec.min.rst -mol2 > ${system}.rec.min.0.mol2
-${amberdir}/antechamber -i ${system}.rec.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.rec.min.mol2 -fo mol2 -dr n >& 04.${system}.rec.ante.out
+${amberbin}/ambpdb -p ${system}.rec.parm -c 04.${system}.rec.min.rst -mol2 > ${system}.rec.min.0.mol2
+${amberbin}/antechamber -i ${system}.rec.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.rec.min.mol2 -fo mol2 -dr n >& 04.${system}.rec.ante.out
 
 rm ${system}.rec.min.0.mol2
 
@@ -318,15 +318,15 @@ echo "Creating ligand mol2 file"
 echo "trajin 04.${system}.com.min.rst" > 04.lig.ptraj.in
 echo "strip !(:LIG)" >> 04.lig.ptraj.in
 echo "trajout 04.${system}.lig.min.rst restart"  >> 04.lig.ptraj.in
-${amberdir}/cpptraj ${system}.com.parm 04.lig.ptraj.in >& 04.lig.ptraj.out
+${amberbin}/cpptraj ${system}.com.parm 04.lig.ptraj.in >& 04.lig.ptraj.out
 grep STRIP 04.lig.ptraj.out
-${amberdir}/ambpdb -p ${system}.lig.parm -c 04.${system}.lig.min.rst -mol2 > ${system}.lig.min.0.mol2
-${amberdir}/antechamber -i ${system}.lig.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.lig_CYS.min.mol2 -fo mol2 -dr n >& 04.lig.min.ante.out
+${amberbin}/ambpdb -p ${system}.lig.parm -c 04.${system}.lig.min.rst -mol2 > ${system}.lig.min.0.mol2
+${amberbin}/antechamber -i ${system}.lig.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.lig_CYS.min.mol2 -fo mol2 -dr n >& 04.lig.min.ante.out
 
 rm ${system}.lig.min.0.mol2
 
-${amberdir}/ambpdb -p ${system}.com.parm -c 04.${system}.com.min.rst -mol2 > ${system}.com.min.0.mol2
-${amberdir}/antechamber -i ${system}.com.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.com.min.mol2 -fo mol2 -dr n >& 04.com.min.ante.out
+${amberbin}/ambpdb -p ${system}.com.parm -c 04.${system}.com.min.rst -mol2 > ${system}.com.min.0.mol2
+${amberbin}/antechamber -i ${system}.com.min.0.mol2 -fi mol2 -at sybyl -j 5 -o 04.${system}.com.min.mol2 -fo mol2 -dr n >& 04.com.min.ante.out
 
 rm ${system}.com.min.0.mol2
 
@@ -340,7 +340,7 @@ python ${scriptdir}/calc_rmsd_mol2.py 03.${system}.com.ori.mol2 04.${system}.com
 python ${scriptdir}/clean_mol2.py 04.${system}.rec.min.mol2 05.${system}.rec.clean.mol2
 #python ${scriptdir}/clean_mol2.py 04.${system}.lig_CYS.min.mol2 05.${system}.lig_CYS.clean.mol2
 
-${amberdir}/ambpdb -p ${system}.rec.parm -c 04.${system}.rec.min.rst > 05.${system}.rec.clean.pdb
+${amberbin}/ambpdb -p ${system}.rec.parm -c 04.${system}.rec.min.rst > 05.${system}.rec.clean.pdb
 
 # create PDB file of minimized ligand for use in sphere gen
 antechamber -fi mol2 -i 04.${system}.lig_CYS.min.mol2 -fo pdb -o 05.${system}.lig.clean.pdb -dr no > 04.lig.ante.v.out
