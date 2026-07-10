@@ -343,7 +343,7 @@ python ${scriptdir}/clean_mol2.py 04.${system}.rec.min.mol2 05.${system}.rec.cle
 ${amberbin}/ambpdb -p ${system}.rec.parm -c 04.${system}.rec.min.rst > 05.${system}.rec.clean.pdb
 
 # create PDB file of minimized ligand for use in sphere gen
-antechamber -fi mol2 -i 04.${system}.lig_CYS.min.mol2 -fo pdb -o 05.${system}.lig.clean.pdb -dr no > 04.lig.ante.v.out
+${amberbin}/antechamber -fi mol2 -i 04.${system}.lig_CYS.min.mol2 -fo pdb -o 05.${system}.lig.clean.pdb -dr no > 04.lig.ante.v.out
 
 # remove CYS from ligand and add dummy atoms
 python ${scriptdir}/remove_CYS.py 04.${system}.lig_CYS.min.mol2 05.${system}.lig.clean.mol2
