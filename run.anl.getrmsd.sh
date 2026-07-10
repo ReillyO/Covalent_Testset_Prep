@@ -38,6 +38,5 @@ for f in `ls -d ${testsetdir}/*`; do
   sed -i "s/########## HA_RMSDh: /,/g" ${outfile}
   sed -i "s/ //" ${outfile}
 
-  break
 done
 
