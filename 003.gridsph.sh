@@ -9,7 +9,7 @@
 dockdir=${DOCKHOME}
 amberbin=${AMBERBIN}
 rootdir=${ROOTDIR}
-chimerabin=${CHIMERABIN}
+chimeradir=${CHIMERAHOME}
 dmsdir=${DMSHOME}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
@@ -107,7 +107,7 @@ clustertemp
 N
 EOF
 ##################################################
-${dockdir}/showsphere < showsphere.in > showsphere.v.txt
+${dockdir}/bin/showsphere < showsphere.in > showsphere.v.txt
 
 ### Make a PDB file that contains all the pruned clusters for viewing
 cat clustertemp* >> all.clust.pdb
