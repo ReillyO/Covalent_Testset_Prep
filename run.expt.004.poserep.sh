@@ -1,4 +1,10 @@
 #!/bin/bash
+#SBATCH --time=7-00:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --job-name=cov004
+#SBATCH --output=cov004.out
+#SBATCH -p DESIGNATED NODE NAME
 
 # conducts a standard virtual screening of all systems that have a 
 # grid prepared using the standard covalent protocol
@@ -6,15 +12,13 @@
 # sample usage: bash run.expt.poserep.sh
 
 
-dockdir=${DOCKHOME}
-amberdir=${AMBERHOME}
+dockhome=${DOCKHOME}
 rootdir=${ROOTDIR}
-chimeradir=${CHIMERAHOME}
 testsetdir=${rootdir}/zzz.testset_files/
 rawfiledir=${rootdir}/zzz.master/
 scriptdir=${rootdir}/zzz.scripts/
 paramdir=${rootdir}/zzz.parameters/
-analysisdir=${rootdir}/zzz.analysis
+analysisdir=${rootdir}/zzz.analysis/
 
 prefix="004.poserep"
 
@@ -25,7 +29,7 @@ for f in `ls -d ${testsetdir}/*`; do
   system=${f: -4}
   sysdir=${testsetdir}/${system}
   
-  echo "Copying pertinent files..."
+  echo "Copying pertinent files for system ${system}..."
   if [ -e ${sysdir}/${prefix} ]; then rm -rf ${sysdir}/${prefix}; fi
   mkdir ${sysdir}/${prefix}
   cd ${sysdir}/${prefix} 
@@ -118,12 +122,13 @@ EOF
   cat <<EOF>submit.sh
 #!/bin/bash
  
-${dockdir}/dock6 -V -i cov.in -o cov.out &
+${dockhome}/bin/dock6 -V -i cov.in -o cov.out 
 EOF
   
   chmod +x submit.sh
+  echo "running DOCK via srun"
   srun --mem-per-cpu=5000 --exclusive --ntasks-per-core=1 -N1 -n1 -W 0 submit.sh &
-  
+
 done
 
 # wait for all docking to complete
